@@ -1,0 +1,8 @@
+CLAUDE.md
+venv/
+aws/
+awscliv2.zip
+.env
+__pycache__/
+*.pyc
+.vscode/
