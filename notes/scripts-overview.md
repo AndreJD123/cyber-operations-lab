@@ -46,3 +46,4 @@ bash push.sh "your commit message here"
 
 - Sample log files live in `python/datasets/`
 - Never push `venv/`, `aws/`, `.env`, or `awscliv2.zip`
+- Session history → `notes/progress-log.md`

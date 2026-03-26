@@ -93,3 +93,10 @@ After introducing ANY new Python concept in a script or practice file:
    - One-line comment explaining why it's useful in security scripting
 
 Do both of these automatically — do not ask, do not wait to be told.
+
+At the END of every session when the user is wrapping up:
+3. Append a new entry to notes/progress-log.md with:
+   - Session date
+   - What was built or practiced
+   - Python and SOC concepts introduced
+   - 2-3 options for what to pick up next session
