@@ -10,7 +10,7 @@ Run it:
 
 SOC Context:
     Windows Security Events are the raw telemetry behind most SIEM alerts.
-    Every alert you triage in Helix started as one of these events.
+    Every alert you triage in enterprise SIEM started as one of these events.
     This script teaches you to think in events, not just dashboard tiles.
 
 Key Event IDs covered:
@@ -64,7 +64,7 @@ SUSPICIOUS_CMD_PATTERNS = [
     r"net localgroup administrators",  # checking/modifying admin group
 ]
 
-# Logon types explained — this is what Helix shows when you look at a 4624/4625
+# Logon types explained — this is what enterprise SIEM shows when you look at a 4624/4625
 # Knowing these lets you tell interactive user logins from service/network logins
 LOGON_TYPE_MAP = {
     0: "System",

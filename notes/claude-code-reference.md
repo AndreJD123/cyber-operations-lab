@@ -38,7 +38,7 @@ Explain why you'd use it over the alternative.
 
 ### Connect to real work
 ```
-What would this script's output look like as a Helix alert?
+What would this script's output look like as an enterprise SIEM alert?
 What MITRE technique does this map to?
 ```
 
