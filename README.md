@@ -36,8 +36,7 @@ cyberlab/
 │   └── datasets/       # Sample logs and mock event data for testing
 ├── notes/
 │   ├── scripts-overview.md   # One-liner index of every script
-│   ├── python-cheatsheet.md  # Running reference of Python concepts used
-│   └── progress-log.md       # Session-by-session build log
+│   └── python-cheatsheet.md  # Running reference of Python concepts used
 └── bash/               # Bash scripts
 ```
 
@@ -45,12 +44,9 @@ cyberlab/
 
 ## Roadmap
 
-Current focus:
 - [x] SSH log analysis and brute force detection
 - [x] Windows Security Event log analysis (4624, 4625, 4648, 4672, 4688)
-- [ ] AWS security posture checker (boto3 + IAM/S3)
-- [ ] GuardDuty findings parser
-- [ ] Claude API security automation tool
+- [ ] AWS-native detection pipeline (CloudTrail + GuardDuty + Athena)
 
 ---
 

@@ -7,3 +7,5 @@ __pycache__/
 *.pyc
 .vscode/
 *.code-workspace
+notes/progress-log.md
+push.sh

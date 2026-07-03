@@ -15,6 +15,24 @@ Update this file each time you add a new script.
 
 ---
 
+## python/soc-automation-toolkit/
+
+Full multi-module pipeline project. Run with `python run.py [source]` from the toolkit directory.
+
+| Module | What it does | Key Python concepts | MITRE ATT&CK |
+|---|---|---|---|
+| `src/parsers/edr.py` | Normalizes EDR endpoint alerts (process, parent, command line, hashes) into shared schema | inheritance, ABC, dict.get() with defaults | T1059.001 — PowerShell |
+| `src/parsers/okta.py` | Normalizes Okta impossible-travel events; extracts nested geo data | class-level constants, nested dict chaining | T1078 — Valid Accounts |
+| `src/parsers/guardduty.py` | Normalizes GuardDuty findings; converts numeric severity (0.1–8.9) to categorical label | static method, dict comprehension, chained .get() | T1552 — Unsecured Credentials |
+| `src/parsers/wiz.py` | Normalizes Wiz toxic-combination findings; maps UPPERCASE severity | class constant dict, list comprehension over nested list | T1190 — Exploit Public-Facing App |
+| `src/parsers/dlp.py` | Normalizes DLP alerts; captures prior violation count as first-class field | conditional expression (ternary), f-string interpolation | T1048 — Exfil Over Alternative Protocol |
+| `src/risk_scorer.py` | Additive risk scoring (severity base + contextual bonuses); records each factor | list accumulation, any() with generator, str.startswith() tuple, min() | — |
+| `src/mitre_mapper.py` | Resolves ATT&CK technique IDs to full metadata from a curated local DB | module-level constant dict, list comprehension with None filter | T1059.001, T1078, T1110, T1190, T1048, T1552, T1133, T1140, T1021, T1567 |
+| `src/ioc_extractor.py` | Extracts IPs, MD5/SHA256 hashes, emails, URLs via compiled regex; recursively flattens raw dict | re.compile(), re.findall(), set() dedup, recursive function with depth limit | — |
+| `src/case_summary.py` | Assembles all enrichment outputs + triage playbook into CaseSummary; renders as text or dict | enumerate() with start, function composition, manual JSON serialization | — |
+
+---
+
 ## python/practice/
 
 | File | Concepts covered |

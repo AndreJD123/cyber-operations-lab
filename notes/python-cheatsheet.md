@@ -318,3 +318,181 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+---
+
+## dataclass (`@dataclass`)
+
+```python
+from dataclasses import dataclass, field
+
+@dataclass
+class Alert:
+    alert_id: str
+    severity: str
+    tags: list[str] = field(default_factory=list)   # mutable default — must use field()
+
+# @dataclass auto-generates __init__, __repr__, __eq__
+# No need to write: def __init__(self, alert_id, severity, tags=None): ...
+a = Alert(alert_id="001", severity="high")
+print(a)  # Alert(alert_id='001', severity='high', tags=[])
+```
+
+Use `field(default_factory=list)` for mutable defaults (lists, dicts). Without it,
+ALL instances would share the SAME list — a classic Python gotcha.
+
+---
+
+## ABC — Abstract Base Class
+
+```python
+from abc import ABC, abstractmethod
+
+class BaseParser(ABC):
+    @abstractmethod
+    def parse(self, raw: dict) -> dict:
+        ...   # subclasses MUST implement this
+
+class EDRParser(BaseParser):
+    def parse(self, raw: dict) -> dict:
+        return {"source": "edr", "id": raw["alert_id"]}
+
+# EDRParser() works fine.
+# A class that inherits BaseParser but skips parse() raises TypeError at instantiation.
+```
+
+Use ABCs when you want a contract that fails fast — at class instantiation, not at call time.
+
+---
+
+## Factory function + dispatch table
+
+```python
+from .edr import EDRParser
+from .okta import OktaParser
+
+# Dict maps string keys to classes (not instances)
+_PARSERS = {
+    "edr": EDRParser,
+    "okta": OktaParser,
+}
+
+def get_parser(source: str):
+    cls = _PARSERS.get(source.lower())
+    if cls is None:
+        raise ValueError(f"Unknown source: {source}")
+    return cls()   # instantiate and return
+```
+
+O(1) lookup instead of if/elif chain. Adding a new source = one new dict entry.
+
+---
+
+## `re.compile()` — pre-compiled regex
+
+```python
+import re
+
+# Compile once at module load — reuse many times (faster in loops)
+_RE_IP = re.compile(r"\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b")
+_RE_MD5 = re.compile(r"\b[0-9a-fA-F]{32}\b")
+
+text = "Connection from 203.0.113.1, hash 5d41402abc4b2a76b9719d911017c592"
+ips = _RE_IP.findall(text)    # ['203.0.113.1']
+md5s = _RE_MD5.findall(text)  # ['5d41402abc4b2a76b9719d911017c592']
+```
+
+`findall()` returns all non-overlapping matches as a list.
+`compile()` vs inline `re.findall(pattern, text)`: same result, faster in a loop.
+
+---
+
+## `any()` with generator expression
+
+```python
+keywords = ("admin", "svc_", "root")
+
+# Check if ANY keyword appears in a username — short-circuits on first True
+username = "svc_backup"
+is_privileged = any(kw in username.lower() for kw in keywords)  # True
+
+# Equivalent for loop (less idiomatic):
+is_privileged = False
+for kw in keywords:
+    if kw in username.lower():
+        is_privileged = True
+        break
+```
+
+`any()` stops evaluating as soon as it finds a True result — efficient.
+
+---
+
+## `str.startswith()` with a tuple
+
+```python
+# Check multiple prefixes in ONE call — no loop needed
+private_prefixes = ("10.", "192.168.", "127.", "172.16.")
+ip = "192.168.1.100"
+
+is_private = ip.startswith(private_prefixes)  # True — checks all prefixes at once
+```
+
+Much cleaner than `ip.startswith("10.") or ip.startswith("192.168.") or ...`
+
+---
+
+## `enumerate()` with a start value
+
+```python
+steps = ["Isolate the host", "Collect memory dump", "Search for lateral movement"]
+
+# enumerate gives (index, value) pairs — start=1 makes it a natural numbered list
+for i, step in enumerate(steps, start=1):
+    print(f"  {i}. {step}")
+# Output:
+#   1. Isolate the host
+#   2. Collect memory dump
+#   3. Search for lateral movement
+```
+
+Avoids a manual counter variable (`i = 0; i += 1` pattern).
+
+---
+
+## Recursive function with depth limit
+
+```python
+def flatten_dict(d: dict, depth: int = 0) -> list[str]:
+    """Extract all string values from a nested dict, any depth."""
+    if depth > 5:          # safety valve — stop if too deep
+        return []
+    results = []
+    for value in d.values():
+        if isinstance(value, str):
+            results.append(value)
+        elif isinstance(value, dict):
+            results.extend(flatten_dict(value, depth + 1))   # recurse
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    results.extend(flatten_dict(item, depth + 1))
+    return results
+```
+
+Recursive functions call themselves. The depth limit prevents infinite recursion on
+pathological inputs. Used here to extract IOC strings from deeply nested alert JSON.
+
+---
+
+## List comprehension with `None` filter
+
+```python
+results_or_none = [lookup(x) for x in ids]       # may contain None values
+clean_results   = [r for r in results_or_none if r is not None]  # filter None out
+
+# One-liner version:
+clean = [r for r in (lookup(x) for x in ids) if r is not None]
+```
+
+Pattern: look up each item (may return None), then filter the None values in one pass.
