@@ -6,6 +6,46 @@ first entries lives in `docs/architecture-review-2026-07.md`.
 
 ---
 
+## 2026-07-04 — Persistent/ephemeral stack split (implemented)
+
+**Chose:** Two Terraform stacks in separate directories with independent state files: `aws/detection-lab/persistent/` (CloudTrail trail + evidence bucket, Glue database, Athena results bucket + workgroup — applied once, lives for months) and a future `ephemeral/` (VPC, EC2, flow logs — destroyed every session).
+**Rejected:** One stack with `-target` destroys (error-prone, fights the tool); keeping the all-ephemeral rule (session one of Phase 2 would have ~45 minutes of history to query and GuardDuty would baseline an empty account forever).
+**Why:** Terraform can only destroy what's in the state file it's pointed at, so a destroy in `ephemeral/` is physically incapable of touching the log archive. The pipeline's value is accumulated history; the compute that generates telemetry is disposable.
+**Tradeoff:** Two directories to manage and some duplicated boilerplate (providers, tags). Standing cost of the persistent layer: pennies/month (first trail free, S3 with 90-day expiry).
+**Interview talking point:** "I isolate blast radius with state separation — my teardown command is physically unable to delete evidence, not just instructed not to."
+
+---
+
+## 2026-07-04 — force_destroy asymmetry across sibling buckets
+
+**Chose:** `force_destroy = false` on the CloudTrail evidence bucket; `force_destroy = true` on the Athena results bucket.
+**Rejected:** Uniform `true` (a `terraform destroy` could vaporize months of evidence as a side effect — watched exactly that happen to the portfolio stack's logs the same morning); uniform `false` (pointless friction on disposable query scratch).
+**Why:** The setting should follow the data's role. Evidence deletion must be a deliberate, manual act (empty the bucket yourself, then destroy); scratch CSV results expire in 7 days anyway.
+**Tradeoff:** A deliberate teardown of the persistent stack requires one extra manual step. That friction is the feature.
+**Interview talking point:** "Same setting, opposite values, each defended — retention posture is a property of the data, not of the stack."
+
+---
+
+## 2026-07-04 — GuardDuty deferred to the Phase 3/4 boundary
+
+**Chose:** No GuardDuty detector in the persistent stack yet; add it (a two-line change) when Phase 3 wraps.
+**Rejected:** Enabling now for baseline-building — the one-time, non-resettable 30-day free trial would burn during weeks of Athena/Sigma work that consumes zero findings.
+**Why:** Capability should arrive when its consumer exists (same test that cut n8n and deferred CI/CD). The trial window should overlap Phases 4–6, which actually consume findings; `CreateSampleFindings` covers any gap.
+**Tradeoff:** No organic anomaly baseline on day one of Phase 4. Acceptable — sample findings and CloudTrail-based detections carry that phase.
+**Interview talking point:** "I sequence tooling by named problem, not by resume keyword — three times in one week the same test made the call."
+
+---
+
+## 2026-07-04 — IAM for IaC: service-scoped managed policies + minimal inline patches
+
+**Chose:** For the `cyberlab` CLI group: AWS-managed service-scoped policies (`AmazonEC2FullAccess`, `AWSCloudTrail_FullAccess`, `AmazonAthenaFullAccess`) plus a 3-action inline patch (`glue-tagging`: GetTags/TagResource/UntagResource) where the managed policy has a pothole.
+**Rejected:** `AdministratorAccess` (unbounded blast radius on a long-lived credential); hand-rolled minimal policies (Terraform needs symmetric CRUD — the deny→add-one-action→retry loop was measured today at one failed apply per missing service).
+**Why:** IaC tooling needs broad rights within the services it manages. Compensating controls: zero-spend budget, short sessions, no other principals. Production answer is a pipeline role with OIDC, permission boundaries, and SCPs — this is the single-human lab approximation.
+**Tradeoff:** A leaked `bluelab-cli` key can run arbitrary EC2 compute. Mitigated, not eliminated.
+**Interview talking point:** "AmazonAthenaFullAccess famously omits glue:GetTags — Terraform's post-create tag read fails and taints the resource. I read the managed policy's JSON now, not its name."
+
+---
+
 ## 2026-07-03 — n8n dropped from pipeline scope
 
 **Chose:** EventBridge + Lambda as the only orchestration/SOAR-lite layer (Phases 4 and 6).
