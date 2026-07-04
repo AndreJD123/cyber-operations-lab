@@ -64,7 +64,12 @@ VirusTotal / AbuseIPDB / GreyNoise, score it, output a structured triage summary
 **Skill gap:** tool-to-tool integration, dashboard design
 
 Route findings: GuardDuty → Security Hub → EventBridge.
-Optional SIEM layer: Wazuh on a small EC2 (free, real alerting), build a dashboard.
+
+Wazuh (re-scoped 2026-07-03, see docs/architecture-review-2026-07.md §2):
+manager/indexer/dashboard run in local Docker on WSL2 ($0, survives terraform
+destroy), lightweight agent on the lab EC2 for host telemetry. Moved to a
+post-Phase-6 stretch goal — it is a host-telemetry comparison exercise, not
+the pipeline's SIEM layer.
 
 **Goal:** Explain what each panel surfaces, why it's there, and what alert it would
 generate in a real SOC.
