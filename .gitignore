@@ -9,3 +9,4 @@ __pycache__/
 *.code-workspace
 notes/progress-log.md
 push.sh
+docs/*worksheet*.md
